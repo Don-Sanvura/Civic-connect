@@ -4,7 +4,7 @@ Status: working addendum; team review and PED integration required.
 ## Repository evidence
 - API and domain logic: ../../src/app.js
 - Server/configuration: ../../src/server.js and ../../.env.example
-- Automated suite: ../../tests/civicconnect.test.js
+- Automated suite: ../../tests/civicconnect.test.js (25 cases; latest CI run pending)
 - Performance exercise: ../../scripts/performance-runner.js
 - CI/security workflow: ../../.github/workflows/ci.yml
 - RTM addendum: ../RTM/M3-RTM-addendum.csv
@@ -15,7 +15,7 @@ Status: working addendum; team review and PED integration required.
 3. Review record with two distinct approvals.
 4. Staging URL, deployed SHA, health check and smoke-test output.
 5. Repeated load-test output and comparison to the authoritative NFR threshold.
-6. All 40 baseline requirements reconciled to exact acceptance criteria and execution evidence.
+6. All 40 baseline trace IDs are mapped in the addendum; reconcile exact acceptance criteria and obtain execution evidence for every applicable requirement.
 7. Existing risk, defect, technical-debt, ADR and AI usage registers updated without renumbering IDs.
 8. Team-reviewed PED v3.0 and signed release decision.
 
