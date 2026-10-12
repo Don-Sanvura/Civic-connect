@@ -6,7 +6,7 @@ SEN381 Software Engineering 381 (NQF 8), Belgium Campus ITversity, 2026.
 | | |
 |---|---|
 | **Current baseline** | PED v1.0 - Engineering Foundation & Requirements Baseline |
-| **Milestone** | M1 baseline preserved · M3 release-candidate spike on feature branch; team approval and DEC-008 evidence pending |
+| **Milestone** | M3 proof-of-concept foundation merged; release remains NOT READY pending DEC-008 evidence, outstanding requirements and release gates |
 | **Team** | Masego (Workstream A) · Don (Workstream B) · Emile (Workstream C) |
 | **Governing document** | SEN381 CivicConnect Master Project Brief v1.1 |
 
@@ -28,6 +28,7 @@ audit trail — without creating an unsustainable technical, operational or fina
 | What has happened so far | [`PROJECT_HISTORY.md`](PROJECT_HISTORY.md) |
 | What we are building and why | [`docs/PED/`](docs/PED/) |
 | What we committed to build | [`docs/requirements/`](docs/requirements/) |
+| M3 plan, team roles and responsibilities | [`docs/project/M3-PROJECT-PLAN.md`](docs/project/M3-PROJECT-PLAN.md) |
 | What could go wrong | [`docs/risk/risk-register.csv`](docs/risk/risk-register.csv) |
 | Why we chose what we chose | [`docs/decisions/decision-log.csv`](docs/decisions/decision-log.csv) |
 
@@ -41,7 +42,7 @@ audit trail — without creating an unsustainable technical, operational or fina
 
 ## Deliberately not decided yet
 
-Technology stack, architecture, database schema, UI design and API contracts remain subject to the evidence and approval requirements in DEC-008. This branch contains a provisional M3 API proof of concept, tests and CI as a spike only. It is not the approved production architecture; most baseline requirements remain unimplemented and the release status is NOT READY.
+Technology stack, architecture, database schema, UI design and API contracts remain subject to the evidence and approval requirements in DEC-008. The M3 API proof of concept, tests and CI foundation have been merged to main. This is not the approved production architecture; most baseline requirements remain unimplemented and the release status is NOT READY.
 
 ## Governance
 
