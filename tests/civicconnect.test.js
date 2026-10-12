@@ -1,28 +1,74 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {createServer} from 'node:http';import {once} from 'node:events';import {createService,createHandler,parseTokens,HttpError} from '../src/app.js';
-const tokens=new Map([['req-A','requester'],['req-B','requester'],['staff-A','staff'],['staff-B','staff'],['mgr','manager'],['admin','admin']]);
-const actor=(id,role)=>({id,role});const req=()=>({title:'Broken streetlight',description:'Streetlight outside the local library is broken.',category:'Roads'});
-function fx(){let n=0;return createService({tokens,id:()=>String(++n),now:()=>new Date(1700000000000+n*1000).toISOString()})}
-function denied(fn,status,code){assert.throws(fn,e=>e instanceof HttpError&&e.status===status&&e.code===code)}
-test('TST-001 [FR-001] valid request begins SUBMITTED',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());assert.equal(x.status,'SUBMITTED');assert.equal(x.version,1)});
-test('TST-002 [FR-001] title length 2 rejected',()=>denied(()=>fx().createRequest(actor('req-A','requester'),{...req(),title:'ab'}),400,'INVALID_TITLE'));
-test('TST-003 [FR-001] title length 120 accepted',()=>assert.equal(fx().createRequest(actor('req-A','requester'),{...req(),title:'x'.repeat(120)}).title.length,120));
-test('TST-004 [FR-001] title length 121 rejected',()=>denied(()=>fx().createRequest(actor('req-A','requester'),{...req(),title:'x'.repeat(121)}),400,'INVALID_TITLE'));
-test('TST-005 [FR-001] short description rejected',()=>denied(()=>fx().createRequest(actor('req-A','requester'),{...req(),description:'short'}),400,'INVALID_DESCRIPTION'));
-test('TST-006 [FR-014] requester cannot assign request',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());denied(()=>s.assignRequest(actor('req-A','requester'),x.id,'staff-A'),403,'FORBIDDEN')});
-test('TST-007 [FR-014] manager assignment updates owner and status',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req()),y=s.assignRequest(actor('mgr','manager'),x.id,'staff-A');assert.equal(y.status,'ASSIGNED');assert.equal(y.assigneeId,'staff-A');assert.equal(y.version,2)});
-test('TST-008 [FR-015] assigned staff can start work',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());s.assignRequest(actor('mgr','manager'),x.id,'staff-A');assert.equal(s.transitionRequest(actor('staff-A','staff'),x.id,'IN_PROGRESS').status,'IN_PROGRESS')});
-test('TST-009 [FR-015] SUBMITTED cannot jump to CLOSED',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());denied(()=>s.transitionRequest(actor('mgr','manager'),x.id,'CLOSED'),409,'INVALID_TRANSITION')});
-test('TST-010 [NFR-004] non-assignee staff is forbidden',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());s.assignRequest(actor('mgr','manager'),x.id,'staff-B');denied(()=>s.transitionRequest(actor('staff-A','staff'),x.id,'IN_PROGRESS'),403,'NOT_ASSIGNEE')});
-test('TST-011 [FR-016] audit records creation and assignment actors',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());s.assignRequest(actor('mgr','manager'),x.id,'staff-A');assert.deepEqual(s.getAudit(actor('mgr','manager'),x.id).map(a=>a.action),['REQUEST_CREATED','REQUEST_ASSIGNED'])});
-test('TST-012 [FR-009] requester cannot read another requester request',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());denied(()=>s.getRequest(actor('req-B','requester'),x.id),403,'FORBIDDEN')});
-test('TST-013 [NFR-004] unsupported role in token config rejected',()=>assert.throws(()=>parseTokens('{"t":"root"}'),/supported roles/));
-test('TST-014 [FR-015] unknown status rejected',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());denied(()=>s.transitionRequest(actor('mgr','manager'),x.id,'MAGIC'),400,'INVALID_STATUS')});
-test('TST-015 [FR-001] category length 61 rejected',()=>denied(()=>fx().createRequest(actor('req-A','requester'),{...req(),category:'x'.repeat(61)}),400,'INVALID_CATEGORY'));
-test('TST-016 [FR-015] resolved request can reopen',()=>{const s=fx(),x=s.createRequest(actor('req-A','requester'),req());s.assignRequest(actor('mgr','manager'),x.id,'staff-A');s.transitionRequest(actor('staff-A','staff'),x.id,'IN_PROGRESS');s.transitionRequest(actor('staff-A','staff'),x.id,'RESOLVED');assert.equal(s.transitionRequest(actor('staff-A','staff'),x.id,'IN_PROGRESS').status,'IN_PROGRESS')});
-test('TST-017 [API] missing bearer returns 401 structured error',async()=>api(async u=>{const r=await fetch(u+'/api/requests');assert.equal(r.status,401);assert.equal((await r.json()).error.code,'UNAUTHENTICATED')}));
-test('TST-018 [API] malformed JSON returns 400',async()=>api(async u=>{const r=await fetch(u+'/api/requests',{method:'POST',headers:{authorization:'Bearer req-A','content-type':'application/json'},body:'{'});assert.equal(r.status,400);assert.equal((await r.json()).error.code,'INVALID_JSON')}));
-test('TST-019 [API] POST returns 201 and submitted payload',async()=>api(async u=>{const r=await fetch(u+'/api/requests',{method:'POST',headers:{authorization:'Bearer req-A','content-type':'application/json'},body:JSON.stringify(req())});assert.equal(r.status,201);assert.equal((await r.json()).data.status,'SUBMITTED')}));
-test('TST-020 [API] requester forbidden from audit endpoint',async()=>api(async u=>{const c=await fetch(u+'/api/requests',{method:'POST',headers:{authorization:'Bearer req-A','content-type':'application/json'},body:JSON.stringify(req())});const x=(await c.json()).data;const r=await fetch(u+'/api/requests/'+x.id+'/audit',{headers:{authorization:'Bearer req-A'}});assert.equal(r.status,403)}));
-test('TST-021 [E2E] submit, assign, progress, resolve, then audit',async()=>api(async u=>{const call=(p,m,t,b)=>fetch(u+p,{method:m,headers:{authorization:'Bearer '+t,'content-type':'application/json'},...(b?{body:JSON.stringify(b)}:{})});const c=await call('/api/requests','POST','req-A',req()),x=(await c.json()).data;assert.equal(c.status,201);assert.equal((await call('/api/requests/'+x.id+'/assign','POST','mgr',{assigneeId:'staff-A'})).status,200);assert.equal((await call('/api/requests/'+x.id+'/status','PATCH','staff-A',{status:'IN_PROGRESS'})).status,200);assert.equal((await call('/api/requests/'+x.id+'/status','PATCH','staff-A',{status:'RESOLVED'})).status,200);const a=await call('/api/requests/'+x.id+'/audit','GET','mgr');assert.equal((await a.json()).data.length,4)}));
-test('TST-022 [E2E] another requester cannot view the created record',async()=>api(async u=>{const c=await fetch(u+'/api/requests',{method:'POST',headers:{authorization:'Bearer req-A','content-type':'application/json'},body:JSON.stringify(req())});const x=(await c.json()).data;const r=await fetch(u+'/api/requests/'+x.id,{headers:{authorization:'Bearer req-B'}});assert.equal(r.status,403)}));
-async function api(run){const server=createServer(createHandler(createService({tokens})));server.listen(0,'127.0.0.1');await once(server,'listening');try{await run('http://127.0.0.1:'+server.address().port)}finally{server.close();await once(server,'close')}}
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { once } from 'node:events';
+import { createService, createHandler, parseTokens, HttpError } from '../src/app.js';
+
+const tokens = new Map([
+  ['req-A', 'requester'], ['req-B', 'requester'], ['staff-A', 'staff'],
+  ['staff-B', 'staff'], ['mgr', 'manager'], ['admin', 'admin']
+]);
+const actor = (id, role) => ({ id, role });
+const requestBody = () => ({
+  title: 'Broken streetlight',
+  description: 'Streetlight outside the local library is broken.',
+  category: 'Roads',
+  location: 'Outside the local library'
+});
+function fixture() {
+  let n = 0;
+  return createService({ tokens, id: () => String(++n), now: () => new Date(1700000000000 + n * 1000).toISOString() });
+}
+function denied(fn, status, code) {
+  assert.throws(fn, error => error instanceof HttpError && error.status === status && error.code === code);
+}
+async function api(run) {
+  const server = createServer(createHandler(fixture()));
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  try { await run('http://127.0.0.1:' + server.address().port); }
+  finally { server.close(); await once(server, 'close'); }
+}
+async function call(base, path, method, token, body) {
+  return fetch(base + path, {
+    method,
+    headers: { ...(token ? { authorization: 'Bearer ' + token } : {}), ...(body ? { 'content-type': 'application/json' } : {}) },
+    ...(body ? { body: JSON.stringify(body) } : {})
+  });
+}
+
+test('TST-001 [FR-005] valid request is stored as New with unique reference and location', () => {
+  const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody());
+  assert.equal(x.status, 'New'); assert.equal(x.location, 'Outside the local library'); assert.ok(x.id);
+});
+test('TST-002 [NFR-014] title below lower boundary is rejected', () => denied(() => fixture().createRequest(actor('req-A', 'requester'), { ...requestBody(), title: 'ab' }), 400, 'INVALID_TITLE'));
+test('TST-003 [NFR-014] title at 120 characters is accepted', () => assert.equal(fixture().createRequest(actor('req-A', 'requester'), { ...requestBody(), title: 'x'.repeat(120) }).title.length, 120));
+test('TST-004 [NFR-014] title above 120 characters is rejected', () => denied(() => fixture().createRequest(actor('req-A', 'requester'), { ...requestBody(), title: 'x'.repeat(121) }), 400, 'INVALID_TITLE'));
+test('TST-005 [NFR-014] short description is rejected', () => denied(() => fixture().createRequest(actor('req-A', 'requester'), { ...requestBody(), description: 'too short' }), 400, 'INVALID_DESCRIPTION'));
+test('TST-006 [FR-005] missing location is rejected', () => denied(() => fixture().createRequest(actor('req-A', 'requester'), { ...requestBody(), location: '' }), 400, 'INVALID_LOCATION'));
+test('TST-007 [FR-006] free-text category is rejected', () => denied(() => fixture().createRequest(actor('req-A', 'requester'), { ...requestBody(), category: 'Made up category' }), 400, 'INVALID_CATEGORY'));
+test('TST-008 [FR-014] requester cannot assign a request', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); denied(() => s.assignRequest(actor('req-A', 'requester'), x.id, 'staff-A'), 403, 'FORBIDDEN'); });
+test('TST-009 [FR-014] manager assignment records assignee and Accepted status', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()), y = s.assignRequest(actor('mgr', 'manager'), x.id, 'staff-A'); assert.equal(y.status, 'Accepted'); assert.equal(y.assigneeId, 'staff-A'); });
+test('TST-010 [FR-014] staff can self-assign an unassigned New request', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()), y = s.assignRequest(actor('staff-A', 'staff'), x.id); assert.equal(y.assigneeId, 'staff-A'); assert.equal(y.status, 'Accepted'); });
+test('TST-011 [NFR-004] non-assignee staff cannot change request state', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); s.assignRequest(actor('mgr', 'manager'), x.id, 'staff-B'); denied(() => s.transitionRequest(actor('staff-A', 'staff'), x.id, 'In Progress'), 403, 'NOT_ASSIGNEE'); });
+test('TST-012 [FR-015] undefined state transition is rejected', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); denied(() => s.transitionRequest(actor('mgr', 'manager'), x.id, 'Closed'), 409, 'INVALID_TRANSITION'); });
+test('TST-013 [FR-016] resolution requires a note', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); s.assignRequest(actor('mgr', 'manager'), x.id, 'staff-A'); s.transitionRequest(actor('staff-A', 'staff'), x.id, 'In Progress'); denied(() => s.transitionRequest(actor('staff-A', 'staff'), x.id, 'Resolved'), 400, 'RESOLUTION_NOTE_REQUIRED'); });
+test('TST-014 [FR-016] assigned staff can resolve with a note', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); s.assignRequest(actor('mgr', 'manager'), x.id, 'staff-A'); s.transitionRequest(actor('staff-A', 'staff'), x.id, 'In Progress'); assert.equal(s.transitionRequest(actor('staff-A', 'staff'), x.id, 'Resolved', { resolutionNote: 'Replaced the faulty lamp.' }).resolutionNote, 'Replaced the faulty lamp.'); });
+test('TST-015 [FR-017] staff cannot close a resolved request', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); s.assignRequest(actor('mgr', 'manager'), x.id, 'staff-A'); s.transitionRequest(actor('staff-A', 'staff'), x.id, 'In Progress'); s.transitionRequest(actor('staff-A', 'staff'), x.id, 'Resolved', { resolutionNote: 'Replaced the faulty lamp.' }); denied(() => s.transitionRequest(actor('staff-A', 'staff'), x.id, 'Closed'), 403, 'FORBIDDEN'); });
+test('TST-016 [FR-018] rejection requires a reason', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); denied(() => s.transitionRequest(actor('mgr', 'manager'), x.id, 'Rejected'), 400, 'REJECTION_REASON_REQUIRED'); });
+test('TST-017 [FR-018] manager can reject with a reason', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); assert.equal(s.transitionRequest(actor('mgr', 'manager'), x.id, 'Rejected', { reason: 'Duplicate request' }).rejectionReason, 'Duplicate request'); });
+test('TST-018 [FR-008] requester cannot read another requester request', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); denied(() => s.getRequest(actor('req-B', 'requester'), x.id), 403, 'FORBIDDEN'); });
+test('TST-019 [FR-025/NFR-006] audit stores previous and new state values', () => { const s = fixture(), x = s.createRequest(actor('req-A', 'requester'), requestBody()); s.assignRequest(actor('mgr', 'manager'), x.id, 'staff-A'); const a = s.getAudit(actor('mgr', 'manager'), x.id); assert.equal(a.length, 2); assert.equal(a[1].previousValue.status, 'New'); assert.equal(a[1].newValue.status, 'Accepted'); assert.ok(a[1].at); });
+test('TST-020 [API] missing bearer token returns 401 structured error', async () => api(async base => { const r = await call(base, '/api/requests', 'GET'); assert.equal(r.status, 401); assert.equal((await r.json()).error.code, 'UNAUTHENTICATED'); }));
+test('TST-021 [API] malformed JSON returns 400', async () => api(async base => { const r = await fetch(base + '/api/requests', { method: 'POST', headers: { authorization: 'Bearer req-A', 'content-type': 'application/json' }, body: '{' }); assert.equal(r.status, 400); assert.equal((await r.json()).error.code, 'INVALID_JSON'); }));
+test('TST-022 [API/E2E] submit, assign, progress, resolve, close and inspect audit', async () => api(async base => {
+  const created = await call(base, '/api/requests', 'POST', 'req-A', requestBody()); assert.equal(created.status, 201); const x = (await created.json()).data;
+  assert.equal((await call(base, '/api/requests/' + x.id + '/assign', 'POST', 'mgr', { assigneeId: 'staff-A' })).status, 200);
+  assert.equal((await call(base, '/api/requests/' + x.id + '/status', 'PATCH', 'staff-A', { status: 'In Progress' })).status, 200);
+  assert.equal((await call(base, '/api/requests/' + x.id + '/status', 'PATCH', 'staff-A', { status: 'Resolved', resolutionNote: 'Replaced the faulty lamp.' })).status, 200);
+  assert.equal((await call(base, '/api/requests/' + x.id + '/status', 'PATCH', 'mgr', { status: 'Closed' })).status, 200);
+  const audit = await call(base, '/api/requests/' + x.id + '/audit', 'GET', 'mgr'); assert.equal((await audit.json()).data.length, 5);
+}));
+test('TST-023 [FR-023] only administrators may change controlled categories', () => { const s = fixture(); denied(() => s.createCategory(actor('mgr', 'manager'), { name: 'Parks' }), 403, 'FORBIDDEN'); assert.equal(s.createCategory(actor('admin', 'admin'), { name: 'Parks', targetHours: 24 }).name, 'Parks'); });
+test('TST-024 [API] category listing returns controlled values', async () => api(async base => { const r = await call(base, '/api/categories', 'GET', 'req-A'); assert.equal(r.status, 200); assert.ok((await r.json()).data.some(c => c.name === 'Roads')); }));
+test('TST-025 [NFR-004] unsupported role in token config is rejected', () => assert.throws(() => parseTokens('{"t":"root"}'), /supported roles/));
