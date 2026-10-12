@@ -6,7 +6,7 @@ SEN381 Software Engineering 381 (NQF 8), Belgium Campus ITversity, 2026.
 | | |
 |---|---|
 | **Current baseline** | PED v1.0 - Engineering Foundation & Requirements Baseline |
-| **Milestone** | M1 complete · M2 (Architecture, Design & Engineering Decisions) next |
+| **Milestone** | M1 baseline preserved · M3 release-candidate spike on feature branch; team approval and DEC-008 evidence pending |
 | **Team** | Masego (Workstream A) · Don (Workstream B) · Emile (Workstream C) |
 | **Governing document** | SEN381 CivicConnect Master Project Brief v1.1 |
 
@@ -41,10 +41,7 @@ audit trail — without creating an unsustainable technical, operational or fina
 
 ## Deliberately not decided yet
 
-Technology stack, architecture, database schema, UI design, API contracts and CI pipeline are all
-**deferred to M2 or M3**. See [`docs/decisions/decision-log.csv`](docs/decisions/decision-log.csv)
-(DEC-007, DEC-008) for what evidence is still required before deciding. `src/` and `tests/` are
-empty by design at this milestone.
+Technology stack, architecture, database schema, UI design and API contracts remain subject to the evidence and approval requirements in DEC-008. This branch contains a provisional M3 API proof of concept, tests and CI as a spike only. It is not the approved production architecture; most baseline requirements remain unimplemented and the release status is NOT READY.
 
 ## Governance
 
