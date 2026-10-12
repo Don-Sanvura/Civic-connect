@@ -127,6 +127,13 @@ honest capability audit, and a proof of concept covering authentication, persist
 
 ---
 
+
+### 2026-10-12 — M3 project charter and team responsibilities documented
+**Who:** CivicConnect team · **Type:** governance / documentation
+**What:** Added `docs/project/M3-PROJECT-PLAN.md` to define the M3 objective, Workstreams A/B/C, named leads, responsibilities, deliverables, shared review rules, Definition of Done and release gates. Updated the README to reflect that the M3 proof-of-concept foundation has merged while release readiness remains NOT READY, and linked the plan from the PED draft.
+**Affects:** project governance, workstream ownership, release evidence and team defence preparation. Does not approve DEC-008, change the baselined requirements or claim production readiness.
+**Evidence:** `docs/project/M3-PROJECT-PLAN.md`; README; `docs/PED/M3-v3.0-draft.md`.
+
 ## Template for your next entry
 
 ```
