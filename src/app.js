@@ -1,3 +1,4 @@
+import { page, clientScript } from './web.js';
 import { randomUUID } from 'node:crypto';
 
 const roles = new Set(['requester', 'staff', 'manager', 'admin']);
@@ -180,6 +181,16 @@ export function createHandler(service) {
     };
     try {
       if (req.method === 'GET' && req.url === '/health') return send(200, { status: 'ok', service: 'civicconnect' });
+      if (req.method === 'GET' && req.url === '/') {
+        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' });
+        res.end(page);
+        return;
+      }
+      if (req.method === 'GET' && req.url === '/client.js') {
+        res.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' });
+        res.end(clientScript);
+        return;
+      }
       const actor = service.authenticate(req.headers.authorization);
       if (!actor) throw new HttpError(401, 'UNAUTHENTICATED', 'A valid bearer token is required');
       const url = new URL(req.url, 'http://localhost');
