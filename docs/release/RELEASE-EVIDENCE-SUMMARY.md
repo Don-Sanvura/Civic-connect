@@ -1,16 +1,16 @@
 # CivicConnect M3 Release Evidence Summary
 Candidate: feat/m3-release-candidate-foundation
 Decision: NOT READY — evidence is incomplete.
-Date: 2026-10-12. Full quality workflow passed on SHA 72da784bd713034b825f6c07e1d4ad7f7a8dec9b (27 tests). Current HEAD adds TST-028, a second E2E journey; its 28-test CI run is pending.
+Date: 2026-10-12. Build/test job passed 28/28 on SHA c18c56e6f93dff7013d30601f3dd1e3ccecd0585, including TST-028. CodeQL is still running for that SHA; latest documentation-only HEAD 20a54940925ed5424bf2fbbeff53e6966240ecbe has queued CI checks.
 
 | Gate | Status | Evidence needed |
 |---|---|---|
-| Build and tests | PASS on SHA 72da784: 27/27 tests; syntax check passed; npm audit reported 0 vulnerabilities; CodeQL passed. Latest 28-test run pending. | [Quality workflow run #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693346) |
-| Test distribution | Candidate suite: 28 tests including unit/domain, EP/BVA, RBAC negatives, API/integration, two E2E journeys, and UI route/bundle tests. TST-028 is awaiting CI execution evidence. | [Test job logs, run #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693346) |
-| Static/security/dependency scan | PASS on SHA 72da784: secret scan, traceability and CodeQL. Secret scan and traceability passed on intermediate documentation SHA 43a3906; latest test addition is awaiting CI. | [Secret scan #40](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693331), [traceability #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693380), [quality #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693346) |
+| Build and tests | PASS: 28/28 tests; syntax check passed; npm audit reported 0 vulnerabilities on SHA c18c56e. CodeQL job pending; latest docs-only run queued. | [Quality workflow run #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232933632) |
+| Test distribution | PASS: 28 tests, 0 failures, including unit/domain, EP/BVA, RBAC negatives, API/integration, two E2E journeys, and UI route/bundle tests. [Build/test job](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232933632). | [Test job logs, run #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232933632) |
+| Static/security/dependency scan | Secret scan and traceability passed for SHA c18c56e; CodeQL still in progress. Latest docs-only commit is being rechecked. | [Secret scan #45](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232933623), [traceability #42](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232933630), [quality #42](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693346) |
 | Branch governance | Unverified | Actual GitHub branch protection and two approvals |
 | RTM | PASS: all 40 trace IDs mapped; uncovered rows remain marked GAP/PARTIAL. Mapping is not proof of implementation. | [Traceability run #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693380); reconcile each exact acceptance criterion and test result |
-| Performance | PASS for the small synthetic run: 25/25 submissions; 0 failures; p50 40.10 ms, p95 42.45 ms, max 63.70 ms on a GitHub runner. This is not the NFR-001 500-record filtered-list test. | [Quality workflow run #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693346); still run the required 500-record filtered-list test with 10 concurrent users for 5 minutes and repeat measurements |
+| Performance | PASS for the small synthetic run: 25/25 submissions; 0 failures; p50 37.26 ms, p95 40.99 ms, max 60.99 ms on a GitHub runner. This is not the NFR-001 500-record filtered-list test. | [Quality workflow run #37](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38232693346); still run the required 500-record filtered-list test with 10 concurrent users for 5 minutes and repeat measurements |
 | Staging | Not deployed | Host, deployed SHA, health and smoke checks |
 | PED/registers | Draft evidence index | Integrate PED v3.0 and update authoritative registers |
 
