@@ -11,6 +11,10 @@ This document defines the eight links required for a defensible end-to-end evide
 7. **Execution/defect evidence** — cite the CI run or staging test output; if failed, cite a DEF ID and retest evidence. Authored tests are not passed tests.
 8. **Release decision** — cite the PED v3.0 section, risk/technical-debt disposition and named release approval.
 
+## Baseline-wide traceability status
+
+The M3 addendum `docs/RTM/M3-RTM-addendum.csv` now includes all 40 baseline trace IDs and copies exact requirement text and acceptance criteria from the authoritative registers where available. It deliberately marks unsupported requirements as `GAP` and partially implemented requirements as `PARTIAL`; therefore this is a complete mapping inventory, **not** a claim that all 40 requirements are implemented or verified. The latest revised 25-case suite is awaiting CI evidence. DEC-008 remains deferred, so no approved design decision link can be claimed yet.
+
 ## Provisional implementation links
 
 | Candidate behaviour | Implementation | Test cases | Current evidence state |
