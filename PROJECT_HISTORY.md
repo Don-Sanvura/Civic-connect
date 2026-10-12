@@ -13,7 +13,7 @@ AI assistant reads to get up to speed without asking anyone.
 ## Format
 ### 2026-10-12 — M3 implementation foundation and evidence draft opened for review
 **Who:** Don (AI-assisted draft; team review pending) · **Type:** artefact, change
-**What:** Added a provisional Node.js API proof of concept, initially 22 and then 25 baseline-aligned automated test cases, a synthetic load-test script, CI/security workflow, M3 RTM addendum, draft ADR-013, PED evidence index and release-readiness summary. The implementation is not production-ready: storage is in-memory, authentication uses configured demo tokens, and the M3 stack decision remains subject to DEC-008 evidence and team approval.
+**What:** Added a provisional Node.js API proof of concept, initially 22 and then 25 baseline-aligned automated test cases, a synthetic load-test script, CI/security workflow, 40-trace M3 RTM addendum, proposed ADR-013, PED evidence index, change request CHG-001, RSK-15, DEF-001 and M3 technical-debt register. The implementation is not production-ready: storage is in-memory, authentication uses configured demo tokens, and the M3 stack decision remains subject to DEC-008 evidence and team approval.
 **Affects:** proposed M3 construction/testing/release artefacts; AI-011; provisional FR/NFR mappings.
 **Evidence:** branch `feat/m3-release-candidate-foundation`; PR pending at time of entry. CI, staging, performance and two-approval evidence are not yet available.
 
