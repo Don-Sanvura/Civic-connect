@@ -88,3 +88,19 @@ test('TST-027 [UI/API] client bundle is served as JavaScript without HTML interp
   assert.match(r.headers.get('content-type'), /javascript/);
   assert.match(await r.text(), /api\('\/api\/requests'/);
 }));
+
+test('TST-028 [E2E] requester submits a duplicate report, manager rejects with reason, and audit preserves decision', async () => api(async base => {
+  const created = await call(base, '/api/requests', 'POST', 'req-A', requestBody());
+  assert.equal(created.status, 201);
+  const item = (await created.json()).data;
+  const rejected = await call(base, '/api/requests/' + item.id + '/status', 'PATCH', 'mgr', { status: 'Rejected', reason: 'Duplicate report; existing case already covers this location.' });
+  assert.equal(rejected.status, 200);
+  assert.equal((await rejected.json()).data.status, 'Rejected');
+  const requesterList = await call(base, '/api/requests', 'GET', 'req-A');
+  assert.equal((await requesterList.json()).data[0].status, 'Rejected');
+  const audit = await call(base, '/api/requests/' + item.id + '/audit', 'GET', 'mgr');
+  const events = (await audit.json()).data;
+  assert.equal(events.length, 2);
+  assert.equal(events[1].action, 'STATUS_CHANGED');
+  assert.equal(events[1].newValue.rejectionReason, 'Duplicate report; existing case already covers this location.');
+}));
