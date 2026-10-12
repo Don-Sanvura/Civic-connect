@@ -1,0 +1,1 @@
+{"name":"civicconnect","version":"0.3.0","private":true,"type":"module","engines":{"node":">=22"},"scripts":{"start":"node src/server.js","test":"node --test","check":"node --check src/app.js && node --check src/server.js && node --check tests/civicconnect.test.js","load":"node tests/load-test.js"}}
