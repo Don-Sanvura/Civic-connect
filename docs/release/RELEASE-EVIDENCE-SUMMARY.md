@@ -6,7 +6,7 @@ Date: 2026-10-12. At this revision, source/test run #16 had passed the applicati
 | Gate | Status | Evidence needed |
 |---|---|---|
 | Build and tests | Source/test run #16 passed 25/25; documentation/register run #25 pending | [Quality workflow run #16](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38229842401) |
-| Test distribution | 25 tests passed in source/test run #16; subsequent code changes were documentation/register-only | [Quality workflow run #16](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38229842401) |
+| Test distribution | 27 authored tests, latest run pending after frontend changes in source/test run #16; subsequent code changes were documentation/register-only | [Quality workflow run #16](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38229842401) |
 | Static/security/dependency scan | Source/test run #16: npm audit and Gitleaks passed; CodeQL analysis step completed but overall run was cancelled. Latest secret scan and traceability checks in run #25 passed; latest quality job pending. | [Quality run #16](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38229842401), [secret scan #25](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38230163053) |
 | Branch governance | Unverified | Actual GitHub branch protection and two approvals |
 | RTM | All 40 baseline trace IDs now appear in the M3 addendum; most are explicitly marked GAP/PARTIAL. This is trace mapping, not 40 completed implementations. | [Traceability run #25](https://github.com/Don-Sanvura/Civic-connect/actions/runs/38230163005); reconcile each exact acceptance criterion and test result |
