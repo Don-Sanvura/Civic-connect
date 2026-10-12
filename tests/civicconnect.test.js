@@ -72,3 +72,19 @@ test('TST-022 [API/E2E] submit, assign, progress, resolve, close and inspect aud
 test('TST-023 [FR-023] only administrators may change controlled categories', () => { const s = fixture(); denied(() => s.createCategory(actor('mgr', 'manager'), { name: 'Parks' }), 403, 'FORBIDDEN'); assert.equal(s.createCategory(actor('admin', 'admin'), { name: 'Parks', targetHours: 24 }).name, 'Parks'); });
 test('TST-024 [API] category listing returns controlled values', async () => api(async base => { const r = await call(base, '/api/categories', 'GET', 'req-A'); assert.equal(r.status, 200); assert.ok((await r.json()).data.some(c => c.name === 'Roads')); }));
 test('TST-025 [NFR-004] unsupported role in token config is rejected', () => assert.throws(() => parseTokens('{"t":"root"}'), /supported roles/));
+
+test('TST-026 [UI/API] home page serves accessible request intake interface', async () => api(async base => {
+  const r = await fetch(base + '/');
+  assert.equal(r.status, 200);
+  assert.match(r.headers.get('content-type'), /text\/html/);
+  const html = await r.text();
+  assert.match(html, /Submit a service request/);
+  assert.match(html, /aria-live/);
+  assert.match(html, /client\.js/);
+}));
+test('TST-027 [UI/API] client bundle is served as JavaScript without HTML interpretation', async () => api(async base => {
+  const r = await fetch(base + '/client.js');
+  assert.equal(r.status, 200);
+  assert.match(r.headers.get('content-type'), /javascript/);
+  assert.match(await r.text(), /api\('\/api\/requests'/);
+}));
