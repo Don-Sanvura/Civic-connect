@@ -5,7 +5,7 @@ Status: working addendum; team review and PED integration required.
 - API and domain logic: ../../src/app.js
 - Server/configuration: ../../src/server.js and ../../.env.example
 - Automated suite: ../../tests/civicconnect.test.js
-- Performance exercise: ../../tests/load-test.js
+- Performance exercise: ../../scripts/load-test.js
 - CI/security workflow: ../../.github/workflows/ci.yml
 - RTM addendum: ../RTM/M3-RTM-addendum.csv
 
