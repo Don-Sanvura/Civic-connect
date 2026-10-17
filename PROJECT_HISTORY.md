@@ -142,6 +142,12 @@ honest capability audit, and a proof of concept covering authentication, persist
 **Affects:** project governance, workstream ownership, release evidence and team defence preparation. Does not approve DEC-008, change the baselined requirements or claim production readiness.
 **Evidence:** `docs/project/M3-PROJECT-PLAN.md`; README; `docs/PED/M3-v3.0-draft.md`.
 
+### 2026-10-17 — Diagnostic regression candidates and fix handoff shared for review
+**Who:** Emile (AI-assisted preparation; independent review pending) · **Type:** QA / verification
+**What:** Shared an explicit-run diagnostic suite and fix/retest handoff for the security, integrity, audit and assignment findings in the M3 review. Before-fix automated execution produced five failing defect assertions and one passing cloned-response control on unchanged application code. The candidates are kept outside automatic test discovery, with failures and execution instructions stated explicitly; they are not represented as passing acceptance tests.
+**Affects:** FR-003, FR-014, FR-015, FR-025, NFR-004, NFR-006; supporting TR candidate references; AI-013. Original requirement/criterion wording and acceptance statuses remain unchanged; permanent TST/DEF allocation and verified closure follow the reviewed implementation fixes.
+**Evidence:** docs/testing/regression-candidates/HANDOFF.md; request-integrity.mjs; before-fix-summary.json. No raw machine logs or real credentials are published. PR #7 remains a separate documentation review; this follow-up branch depends on it.
+
 ## Template for your next entry
 
 ```

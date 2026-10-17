@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-17 SAST",
+  "applicationSourceAt": "f75a4147b533f2e427c1a708526d26722512bc70",
+  "tests": 6,
+  "passed": 1,
+  "failed": 5,
+  "failingCases": [
+    "REG-01",
+    "REG-02",
+    "REG-03",
+    "REG-04",
+    "REG-05"
+  ],
+  "passingControl": "REG-C01",
+  "syntheticOnly": true,
+  "applicationFixesMade": false,
+  "status": "Before-fix diagnostic results;5 failures expose existing defects. Not acceptance or release sign-off.",
+  "candidateFile": "docs/testing/regression-candidates/request-integrity.mjs",
+  "rawLogsPublished": false
+}
