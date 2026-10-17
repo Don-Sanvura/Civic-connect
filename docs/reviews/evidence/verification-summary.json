@@ -1,0 +1,81 @@
+{
+  "reviewDate": "2026-10-17 SAST",
+  "reviewedCommit": "f874f5cba35cb326c7a3aabeaa0e183f4eedb4b4",
+  "purpose": "Sanitised public summary. Raw machine logs, API payloads and diagnostic scripts are not published in this PR.",
+  "existingSuite": {
+    "tests": 28,
+    "pass": 28,
+    "fail": 0,
+    "localEnvironment": "Windows, Node24.18.0",
+    "githubEnvironment": "Ubuntu, Node22.23.3",
+    "initialSandboxLimitation": "Initial local run had7 localhost-access failures. Completed rerun passed28/28."
+  },
+  "publicCI": {
+    "quality": "https://github.com/Don-Sanvura/Civic-connect/actions/runs/38238109916",
+    "secretScan": "https://github.com/Don-Sanvura/Civic-connect/actions/runs/38238109947",
+    "testJob": 114773737111,
+    "codeqlJob": 114773737383,
+    "syntheticPOSTs": 25,
+    "syntheticFailures": 0,
+    "syntheticP95ms": 42.087963,
+    "gitleaksCommitsScanned": 0,
+    "limitations": [
+      "Small POST exercise is not NFR-001 filtered-list load test.",
+      "CodeQL job success does not itself establish zero critical findings.",
+      "Gitleaks zero-commit range does not establish a full-history scan."
+    ]
+  },
+  "syntheticDiagnostics": [
+    {
+      "id": "QA-P01",
+      "observation": "Closed-to-Resolved refused with INVALID_TRANSITION but resolution note changes; version5 and audit count5 unchanged.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P02",
+      "observation": "Resolution audit previous-value snapshot already contains new note.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P03",
+      "observation": "Manager assignment accepts nonexistent target account.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P04",
+      "observation": "Category POST for existing name can reactivate/update it. Contract question; no baseline ban on upsert asserted.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P05",
+      "observation": "Renamed category has no stable category ID on existing request. Modelling limitation.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P06",
+      "observation": "Rejected-status query returns Accepted and Closed records.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P07",
+      "observation": "Requester receives synthetic Staff credential as assignee ID; credential replay obtains HTTP200 Staff access in isolated fixture. No real user credentials used.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P08",
+      "observation": "Unauthenticated home returns HTTP200 without sign-in redirect.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P09",
+      "observation": "Audit PATCH and DELETE return404.",
+      "confirmed": true
+    },
+    {
+      "id": "QA-P10",
+      "observation": "Fresh service instance has0 records after earlier instance has2.",
+      "confirmed": true
+    }
+  ],
+  "authorReview": "Emile reported reviewing the proposals and authorised PR submission. Independent non-author reviews and final release sign-off remain pending."
+}
