@@ -10,6 +10,14 @@ AI assistant reads to get up to speed without asking anyone.
 
 ---
 
+### 2026-10-17 — M3 QA review and AC identifier correction proposed
+**Who:** Emile (AI-assisted preparation; author review reported in chat, independent team review pending) · **Type:** QA / traceability / governance
+**What:** Added an evidence review of main commit f874f5cba35cb326c7a3aabeaa0e183f4eedb4b4 with a 40-requirement inventory, individual audit of all 28 existing tests, functional/NFR verification specifications and register/documentation recommendations. Corrected the M3 addendum's 40 acceptance-criterion ID cells by keyed lookup to the existing authoritative RTM and retained the displaced priorities in a separate column. Original requirement/criterion wording, identifiers, implementation claims and acceptance statuses remain unchanged by this limited correction.
+**Evidence and limits:** Exact-head GitHub CI and local rerun show 28/28 tests passing. Synthetic diagnostic probes identify credential-identity disclosure/replay and integrity defects; these results do not constitute personal human verification or final acceptance. The current release recommendation remains NOT READY. Findings are proposed for team review; no architecture approval, defect closure, final scope score or release sign-off is recorded.
+**Author review:** Emile stated on 2026-10-17 that he had reviewed the work, agreed with the proposals and authorised this PR submission. Automated test/probe evidence remains automated. Independent non-author reviews and final acceptance are pending.
+**Affects:** TR-001..TR-040; associated FR/NFR and original AC identifiers; AI-012. The authoritative M1 RTM and requirements baseline are preserved. Wider traceability/documentation corrections and implementation fixes remain follow-up work.
+**Evidence:** docs/reviews/CivicConnect-QA-Review.md; docs/reviews/CivicConnect-QA-Evidence.xlsx; docs/reviews/evidence/; docs/RTM/M3-RTM-addendum.csv. PR review/approval references to be added only after they exist.
+
 ## Format
 ### 2026-10-12 — M3 implementation foundation and evidence draft opened for review
 **Who:** Don (AI-assisted draft; team review pending) · **Type:** artefact, change
